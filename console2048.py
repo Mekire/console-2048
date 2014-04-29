@@ -18,14 +18,14 @@ def _getch_windows(prompt):
     two key events.  If you want to use these keys you can create a dictionary
     and return the result of looking up the appropriate second key within the
     if block.
-    """ 
+    """
     print(prompt, end="")
     key = msvcrt.getch()
     if ord(key) == 224:
         key = msvcrt.getch()
         return key
-    print(key)
-    return key
+    print(key.decode())
+    return key.decode()
 
 
 def _getch_linux(prompt):
@@ -174,7 +174,7 @@ def main():
     print_grid(grid)
     while True:
         grid_copy = copy.deepcopy(grid)
-        get_input = getch("Enter direction (w/a/s/d): ").decode()
+        get_input = getch("Enter direction (w/a/s/d): ")
         if get_input in functions:
             functions[get_input](grid)
         elif get_input == "q":

@@ -27,8 +27,8 @@ def _getch_windows(prompt):
     if ord(key) == 224:
         key = msvcrt.getch()
         return key
-    print(key)
-    return key
+    print(key.decode())
+    return key.decode()
 
 
 def _getch_linux(prompt):
@@ -47,8 +47,8 @@ def _getch_linux(prompt):
         char = os.read(fd, 1)
     finally:
         termios.tcsetattr(fd, termios.TCSAFLUSH, old)
-    print(char)
-    return char
+    print(char.decode())
+    return char.decode()
 
 
 #Set version of getch to use based on operating system.
@@ -212,7 +212,7 @@ def main():
     print_grid(grid)
     while True:
         grid_copy = copy.deepcopy(grid)
-        get_input = getch("Enter direction (w/a/s/d): ").decode()
+        get_input = getch("Enter direction (w/a/s/d): ")
         if get_input in functions:
             functions[get_input](grid)
         elif get_input == "q":
