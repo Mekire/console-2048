@@ -1,6 +1,6 @@
-
 from __future__ import print_function
 
+import os
 import sys
 import copy
 import random
@@ -10,32 +10,41 @@ import functools
 if sys.version_info[0] == 2:
     range = xrange
     input = raw_input
-    
+
+
+def _getch_windows(prompt):
+    print(prompt, end="")
+    key = msvcrt.getch()
+    if ord(key) == 224:
+        key = msvcrt.getch()
+        return key
+    print(key)
+    return key
+
+def _getch_linux(prompt):
+    print(prompt, end="")
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    new = termios.tcgetattr(fd)
+    new[3] = new[3] & ~termios.ICANON & ~termios.ECHO
+    new[6][termios.VMIN] = 1
+    new[6][termios.VTIME] = 0
+    termios.tcsetattr(fd, termios.TCSANOW, new)
+    c = None
+    try:
+        c = os.read(fd, 1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+    return c
 
 
 if sys.platform[:3] == 'win':
     import msvcrt
-    def getkey():
-        return msvcrt.getch()
+    getch = _getch_windows
+
 elif sys.platform[:3] == 'lin':
-    import termios, sys, os
-    TERMIOS = termios
-
-    def getkey():
-        fd = sys.stdin.fileno()
-        old = termios.tcgetattr(fd)
-        new = termios.tcgetattr(fd)
-        new[3] = new[3] & ~TERMIOS.ICANON & ~TERMIOS.ECHO
-        new[6][TERMIOS.VMIN] = 1
-        new[6][TERMIOS.VTIME] = 0
-        termios.tcsetattr(fd, TERMIOS.TCSANOW, new)
-        c = None
-        try:
-            c = os.read(fd, 1)
-        finally:
-            termios.tcsetattr(fd, TERMIOS.TCSAFLUSH, old)
-        return c
-
+    import termios
+    getch = _getch_linux
 
 
 def push_row(row, left=True):
@@ -156,16 +165,14 @@ def main():
     done = False
     while not done:
         grid_copy = copy.deepcopy(grid)
-        #get_input = input("Enter direction (w/a/s/d): ").lower()
-        print("Enter direction (w/a/s/d): ")
-        get_input = getkey().decode()
+        get_input = getch("Enter direction (w/a/s/d): ").decode()
         if get_input in functions:
             functions[get_input](grid)
         elif get_input in ("q", "quit"):
             done = True
             break
         else:
-            print("Invalid choice.")
+            print("\nInvalid choice.")
             continue
         if grid != grid_copy:
             if not prepare_next_turn(grid):
@@ -178,4 +185,4 @@ def main():
 
 if __name__ == "__main__":
     main()
- 
+
