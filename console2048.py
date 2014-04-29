@@ -1,3 +1,4 @@
+
 from __future__ import print_function
 
 import sys
@@ -9,6 +10,32 @@ import functools
 if sys.version_info[0] == 2:
     range = xrange
     input = raw_input
+    
+
+
+if sys.platform[:3] == 'win':
+    import msvcrt
+    def getkey():
+        return msvcrt.getch()
+elif sys.platform[:3] == 'lin':
+    import termios, sys, os
+    TERMIOS = termios
+
+    def getkey():
+        fd = sys.stdin.fileno()
+        old = termios.tcgetattr(fd)
+        new = termios.tcgetattr(fd)
+        new[3] = new[3] & ~TERMIOS.ICANON & ~TERMIOS.ECHO
+        new[6][TERMIOS.VMIN] = 1
+        new[6][TERMIOS.VTIME] = 0
+        termios.tcsetattr(fd, TERMIOS.TCSANOW, new)
+        c = None
+        try:
+            c = os.read(fd, 1)
+        finally:
+            termios.tcsetattr(fd, TERMIOS.TCSAFLUSH, old)
+        return c
+
 
 
 def push_row(row, left=True):
@@ -129,7 +156,9 @@ def main():
     done = False
     while not done:
         grid_copy = copy.deepcopy(grid)
-        get_input = input("Enter direction (w/a/s/d): ").lower()
+        #get_input = input("Enter direction (w/a/s/d): ").lower()
+        print("Enter direction (w/a/s/d): ")
+        get_input = getkey().decode()
         if get_input in functions:
             functions[get_input](grid)
         elif get_input in ("q", "quit"):
@@ -149,4 +178,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
+ 
