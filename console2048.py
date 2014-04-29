@@ -172,14 +172,12 @@ def main():
                  "s" : functools.partial(push_all_columns, up=False)}
     grid = get_start_grid(*map(int,sys.argv[1:]))
     print_grid(grid)
-    done = False
-    while not done:
+    while True:
         grid_copy = copy.deepcopy(grid)
         get_input = getch("Enter direction (w/a/s/d): ").decode()
         if get_input in functions:
             functions[get_input](grid)
         elif get_input == "q":
-            done = True
             break
         else:
             print("\nInvalid choice.")
