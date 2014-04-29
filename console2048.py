@@ -13,6 +13,12 @@ if sys.version_info[0] == 2:
 
 
 def _getch_windows(prompt):
+    """
+    Windows specific version of getch.  Special keys like arrows actually post
+    two key events.  If you want to use these keys you can create a dictionary
+    and return the result of looking up the appropriate second key within the
+    if block.
+    """ 
     print(prompt, end="")
     key = msvcrt.getch()
     if ord(key) == 224:
@@ -21,8 +27,11 @@ def _getch_windows(prompt):
     print(key)
     return key
 
+
 def _getch_linux(prompt):
+    """Linux specific version of getch."""
     print(prompt, end="")
+    sys.stdout.flush()
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
     new = termios.tcgetattr(fd)
@@ -30,18 +39,19 @@ def _getch_linux(prompt):
     new[6][termios.VMIN] = 1
     new[6][termios.VTIME] = 0
     termios.tcsetattr(fd, termios.TCSANOW, new)
-    c = None
+    char = None
     try:
-        c = os.read(fd, 1)
+        char = os.read(fd, 1)
     finally:
         termios.tcsetattr(fd, termios.TCSAFLUSH, old)
-    return c
+    print(char)
+    return char
 
 
+#Set version of getch to use based on operating system.
 if sys.platform[:3] == 'win':
     import msvcrt
     getch = _getch_windows
-
 elif sys.platform[:3] == 'lin':
     import termios
     getch = _getch_linux
@@ -168,7 +178,7 @@ def main():
         get_input = getch("Enter direction (w/a/s/d): ").decode()
         if get_input in functions:
             functions[get_input](grid)
-        elif get_input in ("q", "quit"):
+        elif get_input == "q":
             done = True
             break
         else:
