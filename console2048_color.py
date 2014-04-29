@@ -21,7 +21,7 @@ def _getch_windows(prompt):
     two key events.  If you want to use these keys you can create a dictionary
     and return the result of looking up the appropriate second key within the
     if block.
-    """ 
+    """
     print(prompt, end="")
     key = msvcrt.getch()
     if ord(key) == 224:
@@ -92,7 +92,7 @@ COLORS = {2      : "{}   2  {}".format(Back.GREEN, RESET),
           32768  : "{}32768 {}".format(IMPOSSIBLE["CYAN"], RESET),
           65536  : "{}65536 {}".format(IMPOSSIBLE["RED"], RESET),
           131972 : "{}131972{}".format(IMPOSSIBLE["YELLOW"], RESET)}
-          
+
 
 def push_row(row, left=True):
     """Push all tiles in one row; like tiles will be merged together."""
@@ -203,6 +203,7 @@ def main():
     Update game state.
     Display updates to user.
     """
+    colorama.init()
     functions = {"a" : functools.partial(push_all_rows, left=True),
                  "d" : functools.partial(push_all_rows, left=False),
                  "w" : functools.partial(push_all_columns, up=True),
