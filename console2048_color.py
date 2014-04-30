@@ -55,13 +55,13 @@ def _getch_linux(prompt):
 if sys.platform[:3] == 'win':
     import msvcrt
     getch = _getch_windows
-elif sys.platform[:3] == 'lin':
+else:
     import termios
     getch = _getch_linux
 
 
-RESET = Fore.RESET+Back.RESET+Style.RESET_ALL
-WHITE = Fore.BLACK+Back.WHITE
+RESET = Style.RESET_ALL
+WHITE = Fore.BLACK+Back.WHITE+Style.BRIGHT
 
 BRIGHTS = {"GREEN" : Back.GREEN+Fore.RED+Style.BRIGHT,
            "RED" : Back.RED+Fore.GREEN+Style.BRIGHT,
@@ -171,7 +171,7 @@ def get_start_grid(cols=4, rows=4):
     for i in range(2):
         empties = get_empty_cells(grid)
         y,x = random.choice(empties)
-        grid[y][x] = random.choice((2,2,2,4))
+        grid[y][x] = 2 if random.random() < 0.9 else 4
     return grid
 
 
@@ -182,7 +182,7 @@ def prepare_next_turn(grid):
     """
     empties = get_empty_cells(grid)
     y,x = random.choice(empties)
-    grid[y][x] = random.choice((2,2,2,4))
+    grid[y][x] = 2 if random.random() < 0.9 else 4
     return any_possible_moves(grid)
 
 
@@ -192,7 +192,7 @@ def print_grid(grid):
     wall = "+------"*len(grid[0])+"+"
     print(wall)
     for row in grid:
-        meat = "|".join(COLORS[val] if val else "      " for val in row)
+        meat = "|".join(COLORS[val] if val else " "*6 for val in row)
         print("|{}|".format(meat))
         print(wall)
 

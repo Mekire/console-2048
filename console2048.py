@@ -52,7 +52,7 @@ def _getch_linux(prompt):
 if sys.platform[:3] == 'win':
     import msvcrt
     getch = _getch_windows
-elif sys.platform[:3] == 'lin':
+else:
     import termios
     getch = _getch_linux
 
@@ -134,7 +134,7 @@ def get_start_grid(cols=4, rows=4):
     for i in range(2):
         empties = get_empty_cells(grid)
         y,x = random.choice(empties)
-        grid[y][x] = random.choice((2,2,2,4))
+        grid[y][x] = 2 if random.random() < 0.9 else 4
     return grid
 
 
@@ -145,7 +145,7 @@ def prepare_next_turn(grid):
     """
     empties = get_empty_cells(grid)
     y,x = random.choice(empties)
-    grid[y][x] = random.choice((2,2,2,4))
+    grid[y][x] = 2 if random.random() < 0.9 else 4
     return any_possible_moves(grid)
 
 
